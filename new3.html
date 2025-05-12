@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Support Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: white;
+    }
+
+    body.light {
+      --bg-color: linear-gradient(to right, #e0eafc, #cfdef3);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --text-color: #111;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .info i {
+      margin-right: 10px;
+    }
+
+    .chat-box {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #ffffff22;
+      height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 75%;
+    }
+
+    .user-message {
+      background-color: #007bff88;
+      align-self: flex-end;
+      color: white;
+      margin-left: auto;
+    }
+
+    .bot-message {
+      background-color: #55555588;
+      align-self: flex-start;
+      color: white;
+      margin-right: auto;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .callback {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .callback input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .callback button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .confirmation {
+      margin-top: 10px;
+      font-style: italic;
+      color: #0f0;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ffffff44;
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1em;
+    }
+
+    .toggle-btn:hover {
+      background-color: #ffffff88;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #ffffff44;
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1em;
+    }
+
+    .back-btn:hover {
+      background-color: #ffffff88;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="back-btn" onclick="location.href='New.html'"><i class="fas fa-arrow-left"></i> Back</button>
+  <button class="toggle-btn" onclick="toggleTheme()" id="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="container">
+    <h1>Contact Support</h1>
+
+    <div class="info">
+      <div><i class="fas fa-phone"></i> +1-800-123-4567</div>
+      <div><i class="fas fa-envelope"></i> support@example.com</div>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+      <div class="message bot-message">Hello! How can we help you today?</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="chat-input" placeholder="Type your message..." onkeydown="handleKey(event)" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="callback">
+      <input type="text" id="callback-number" placeholder="Enter your phone number for a callback" />
+      <button onclick="requestCallback()">Request Callback</button>
+    </div>
+
+    <div class="confirmation" id="confirmation-message"></div>
+  </div>
+
+  <script>
+    let messageTimestamps = [];
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('theme-toggle').firstElementChild;
+      body.classList.toggle('light');
+      icon.className = body.classList.contains('light') ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    function handleKey(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const now = Date.now();
+      messageTimestamps.push(now);
+
+      // Remove messages older than 60 seconds
+      messageTimestamps = messageTimestamps.filter(timestamp => now - timestamp < 60000);
+
+      if (messageTimestamps.length > 3) {
+        displayBotMessage("Our agents are currently busy. Please wait a moment before sending more messages.");
+        return;
+      }
+
+      displayUserMessage(text);
+      input.value = '';
+
+      setTimeout(() => {
+        displayBotMessage("Thanks for your message. We'll get back to you shortly.");
+      }, 1000);
+    }
+
+    function displayUserMessage(message) {
+      const chatBox = document.getElementById('chat-box');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user-message';
+      userMsg.textContent = message;
+      chatBox.appendChild(userMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function displayBotMessage(message) {
+      const chatBox = document.getElementById('chat-box');
+      const botMsg = document.createElement('div');
+      botMsg.className = 'message bot-message';
+      botMsg.textContent = message;
+      chatBox.appendChild(botMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function requestCallback() {
+      const numberInput = document.getElementById('callback-number');
+      const messageDiv = document.getElementById('confirmation-message');
+      const number = numberInput.value.trim();
+
+      if (number === '') {
+        messageDiv.textContent = 'Please enter a valid phone number.';
+        messageDiv.style.color = '#f00';
+        return;
+      }
+
+      messageDiv.style.color = '#0f0';
+      messageDiv.textContent = 'Thank you! We will call you back as soon as possible.';
+      numberInput.value = '';
+    }
+  </script>
+
+</body>
+</html>

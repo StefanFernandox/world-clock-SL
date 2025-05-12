@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Yearly Calendar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-color: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: white;
+    }
+
+    body.light {
+      --bg-color: linear-gradient(to right, #e0eafc, #cfdef3);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --text-color: #111;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.5s ease;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      font-size: 1.5em;
+      color: var(--text-color);
+      text-decoration: none;
+      padding: 10px;
+      transition: 0.3s;
+    }
+
+    .back-link:hover {
+      color: #ffd700;
+    }
+
+    .toggle-btn {
+      background-color: #ffffff44;
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.2em;
+    }
+
+    .toggle-btn:hover {
+      background-color: #ffffff88;
+    }
+
+    h1#year-title {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .year-nav {
+      margin-bottom: 20px;
+    }
+
+    .year-nav button {
+      font-size: 1.2em;
+      padding: 5px 15px;
+      margin: 0 10px;
+      cursor: pointer;
+      background-color: #ffffff44;
+      color: var(--text-color);
+      border: none;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .year-nav button:hover {
+      background-color: #ffffff88;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .month {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .month-name {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .day-names, .dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      font-size: 0.85em;
+      text-align: center;
+    }
+
+    .day-names div {
+      font-weight: bold;
+      padding: 5px 0;
+      color: #ddd;
+    }
+
+    .dates div {
+      padding: 5px 0;
+    }
+
+    .today {
+      background-color: #007bff;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="New.html" class="back-link" title="Back to Clock"><i class="fas fa-arrow-left"></i></a>
+    <button class="toggle-btn" onclick="toggleTheme()" id="theme-toggle">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
+  <h1 id="year-title">📅 Yearly Calendar</h1>
+
+  <div class="year-nav">
+    <button onclick="changeYear(-1)">← Previous</button>
+    <button onclick="changeYear(1)">Next →</button>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <script>
+    const calendarContainer = document.getElementById('calendar');
+    const yearTitle = document.getElementById('year-title');
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let currentYear = new Date().getFullYear();
+
+    function renderCalendar(year) {
+      yearTitle.textContent = `📅 Calendar - ${year}`;
+      calendarContainer.innerHTML = '';
+      const today = new Date();
+
+      for (let m = 0; m < 12; m++) {
+        const firstDay = new Date(year, m, 1).getDay();
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'month';
+
+        const monthName = document.createElement('div');
+        monthName.className = 'month-name';
+        monthName.textContent = monthNames[m];
+        monthDiv.appendChild(monthName);
+
+        const dayNamesDiv = document.createElement('div');
+        dayNamesDiv.className = 'day-names';
+        dayNames.forEach(d => {
+          const day = document.createElement('div');
+          day.textContent = d;
+          dayNamesDiv.appendChild(day);
+        });
+        monthDiv.appendChild(dayNamesDiv);
+
+        const datesDiv = document.createElement('div');
+        datesDiv.className = 'dates';
+
+        for (let i = 0; i < firstDay; i++) {
+          datesDiv.appendChild(document.createElement('div'));
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateDiv = document.createElement('div');
+          dateDiv.textContent = d;
+
+          if (d === today.getDate() && m === today.getMonth() && year === today.getFullYear()) {
+            dateDiv.classList.add('today');
+          }
+
+          datesDiv.appendChild(dateDiv);
+        }
+
+        monthDiv.appendChild(datesDiv);
+        calendarContainer.appendChild(monthDiv);
+      }
+    }
+
+    function changeYear(direction) {
+      currentYear += direction;
+      renderCalendar(currentYear);
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('theme-toggle').firstElementChild;
+      body.classList.toggle('light');
+      if (body.classList.contains('light')) {
+        icon.className = 'fas fa-sun';  // Light mode icon
+      } else {
+        icon.className = 'fas fa-moon'; // Dark mode icon
+      }
+    }
+
+    renderCalendar(currentYear);
+  </script>
+
+</body>
+</html>

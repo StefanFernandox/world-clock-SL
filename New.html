@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>World Clock</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: white;
+    }
+
+    body.light {
+      --bg-color: linear-gradient(to right, #e0eafc, #cfdef3);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --text-color: #111;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      transition: all 0.5s ease;
+    }
+
+    .toggle-btn {
+      background-color: #ffffff44;
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      margin: 20px 0;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.2em;
+    }
+
+    .toggle-btn:hover {
+      background-color: #ffffff88;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 1100px;
+      width: 90%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .clock {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .clock:hover {
+      transform: scale(1.05);
+    }
+
+    .location {
+      font-weight: bold;
+      font-size: 1.3em;
+      margin-bottom: 10px;
+    }
+
+    .time, .date {
+      margin: 5px 0;
+    }
+
+    .calendar-link {
+      display: inline-flex;
+      align-items: center;
+      background-color: #ffffff44;
+      color: var(--text-color);
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 1.1em;
+      font-weight: bold;
+      margin: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .calendar-link i {
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+
+    .calendar-link:hover {
+      background-color: #ffffff88;
+      transform: translateY(-2px);
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      padding: 30px;
+      border-radius: 15px;
+      min-width: 300px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.5em;
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.8);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    /* Support Button */
+    .support-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: background 0.3s ease;
+      z-index: 999;
+    }
+
+    .support-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="toggle-btn" onclick="toggleTheme()" id="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="container" id="clock-container">
+    <!-- Clocks dynamically inserted -->
+  </div>
+
+  <a href="new2.html" class="calendar-link">
+    <i class="fas fa-calendar-alt"></i> Calendar View
+  </a>
+
+<a href="new3.html" class="support-btn">
+  <i class="fas fa-life-ring"></i> Support
+</a>
+
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <button class="close-btn" onclick="closeModal()">&times;</button>
+    <div class="modal-content" id="modal-content">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <script>
+    const cities = {
+      newyork: { name: 'New York', zone: 'America/New_York' },
+      london: { name: 'London', zone: 'Europe/London' },
+      tokyo: { name: 'Tokyo', zone: 'Asia/Tokyo' },
+      sydney: { name: 'Sydney', zone: 'Australia/Sydney' },
+      dubai: { name: 'Dubai', zone: 'Asia/Dubai' },
+      moscow: { name: 'Moscow', zone: 'Europe/Moscow' },
+      paris: { name: 'Paris', zone: 'Europe/Paris' },
+      delhi: { name: 'New Delhi', zone: 'Asia/Kolkata' },
+      srilanka: { name: 'Sri Lanka', zone: 'Asia/Colombo' },
+      beijing: { name: 'Beijing', zone: 'Asia/Shanghai' },
+      saopaulo: { name: 'São Paulo', zone: 'America/Sao_Paulo' }
+    };
+
+    function updateClocks() {
+      const now = new Date();
+      const container = document.getElementById('clock-container');
+      container.innerHTML = ''; // Clear and rebuild
+
+      for (const id in cities) {
+        const { name, zone } = cities[id];
+        const time = now.toLocaleTimeString('en-US', { timeZone: zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        const date = now.toLocaleDateString('en-US', { timeZone: zone, year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+
+        const clockDiv = document.createElement('div');
+        clockDiv.className = 'clock';
+        clockDiv.setAttribute('data-city', name);
+        clockDiv.setAttribute('data-time', time);
+        clockDiv.setAttribute('data-date', date);
+        clockDiv.innerHTML = `
+          <div class="location">${name}</div>
+          <div class="time">${time}</div>
+          <div class="date">${date}</div>
+        `;
+        clockDiv.onclick = () => showModal(name, time, date);
+        container.appendChild(clockDiv);
+      }
+    }
+
+    function showModal(city, time, date) {
+      document.getElementById('modal-content').innerHTML = `
+        <h2>${city}</h2>
+        <p><strong>Time:</strong> ${time}</p>
+        <p><strong>Date:</strong> ${date}</p>
+      `;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('theme-toggle').firstElementChild;
+      body.classList.toggle('light');
+      icon.className = body.classList.contains('light') ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    setInterval(updateClocks, 1000);
+    updateClocks();
+  </script>
+
+</body>
+</html>

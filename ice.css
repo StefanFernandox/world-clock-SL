@@ -1,0 +1,17 @@
+.calendar-link {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  background-color: #ffffff44;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+.calendar-link i {
+  margin-right: 8px;
+}
+.calendar-link:hover {
+  background-color: #ffffff88;
+}
